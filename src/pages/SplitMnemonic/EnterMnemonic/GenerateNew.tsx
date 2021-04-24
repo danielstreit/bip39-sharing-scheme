@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { Grid, TextField } from "@material-ui/core";
 import { generateMnemonic, validateMnemonic } from "bip39";
-import { SelectMnemonicStrength } from "./SelectMnemonicStrength";
+import { SelectMnemonicStrength } from "../../../components/SelectMnemonicStrength";
 import { useEffect } from "react";
 
 export function GenerateNew() {

@@ -1,24 +1,34 @@
-import { Autocomplete } from "@material-ui/lab";
+import { Autocomplete, createFilterOptions } from "@material-ui/lab";
 import { Controller, useFormContext } from "react-hook-form";
 import { TextField } from "@material-ui/core";
 import { wordlists } from "bip39";
 import { useRef } from "react";
 
 export interface Bip39WordInputProps {
-  index: number;
+  autoFocus?: boolean;
+  error?: boolean;
+  label?: string;
+  name: string;
 }
 
-// TODO: Move to appropriate page
-export function Bip39WordInput({ index }: Bip39WordInputProps) {
+const filterOptions = createFilterOptions({
+  matchFrom: "start",
+});
+
+export function Bip39WordInput({
+  autoFocus,
+  error,
+  label,
+  name,
+}: Bip39WordInputProps) {
   const inputRef = useRef();
-  const { control, errors } = useFormContext();
-  const error = errors?.words?.[index];
+  const { control } = useFormContext();
 
   return (
     <Controller
       control={control}
       defaultValue={null}
-      name={`words[${index}]`}
+      name={name}
       onFocus={() => {
         if (inputRef.current) {
           // @ts-ignore - Need to figure out how to type ref correctly with MUI
@@ -31,15 +41,16 @@ export function Bip39WordInput({ index }: Bip39WordInputProps) {
           autoComplete
           autoHighlight
           autoSelect
+          filterOptions={filterOptions}
           onChange={(_, data) => props.onChange(data)}
           options={wordlists.english}
           renderInput={(params) => (
             <TextField
               {...params}
-              autoFocus={index === 0}
+              autoFocus={autoFocus}
               inputRef={inputRef}
               error={!!error}
-              label={`Word ${index + 1}`}
+              label={label}
               variant="outlined"
             />
           )}

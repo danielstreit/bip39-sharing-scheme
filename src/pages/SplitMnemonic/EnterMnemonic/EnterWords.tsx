@@ -1,12 +1,14 @@
-import { Bip39WordInput } from "./WordInput";
+import { Bip39WordInput } from "../../../components/Bip39WordInput";
 import { Grid } from "@material-ui/core";
 import { useFormContext } from "react-hook-form";
-import { SelectMnemonicStrength } from "./SelectMnemonicStrength";
-import { strengths } from "./strength";
+import {
+  SelectMnemonicStrength,
+  strengths,
+} from "../../../components/SelectMnemonicStrength";
 
 export function EnterWords() {
-  const { watch } = useFormContext();
-  const strength = watch("strength", 256);
+  const { errors, watch } = useFormContext();
+  const strength = watch("strength");
   return (
     <>
       <Grid item xs={12}>
@@ -16,7 +18,11 @@ export function EnterWords() {
         .fill("")
         .map((_value, index) => (
           <Grid key={index} item lg={3} md={4} sm={6} xs={12}>
-            <Bip39WordInput index={index} />
+            <Bip39WordInput
+              name={`words[${index}]`}
+              label={`Word ${index + 1}`}
+              error={errors?.words?.[index]}
+            />
           </Grid>
         ))}
     </>

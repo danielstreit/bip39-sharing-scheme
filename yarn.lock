@@ -10096,6 +10096,14 @@ shallow-clone@^3.0.0:
   dependencies:
     kind-of "^6.0.2"
 
+shamir-bip39@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/shamir-bip39/-/shamir-bip39-0.1.3.tgz#dc7c6db2462519661b72748c2568530daebf3cd6"
+  integrity sha512-vJ7O1TflAArI5Cen9A0hYGcGQgMTwjwp7pjNtNyFNy9Hm7/p3e6y53u539KcNC8ppLCs51vQ5K58sAdO94PfVQ==
+  dependencies:
+    bip39 "^3.0.3"
+    randombytes "^2.1.0"
+
 shebang-command@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/shebang-command/-/shebang-command-1.2.0.tgz#44aac65b695b03398968c39f363fee5deafdf1ea"

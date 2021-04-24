@@ -12,8 +12,7 @@ export enum SplitMnemonicSteps {
 
 export function SplitMnemonic() {
   const [mnemonic, setMnemonic] = useState<string>();
-  const [shares, setShares] = useState<string[]>();
-  const [threshold, setThreshold] = useState<number>();
+  const [shares, setShares] = useState<Record<string, string>>();
   const [activeStep, setActiveStep] = useState(
     SplitMnemonicSteps.EnterMnemonic
   );
@@ -21,7 +20,6 @@ export function SplitMnemonic() {
     setActiveStep(SplitMnemonicSteps.EnterMnemonic);
     setMnemonic(undefined);
     setShares(undefined);
-    setThreshold(undefined);
   }, []);
 
   return (
@@ -50,9 +48,8 @@ export function SplitMnemonic() {
         )}
         {activeStep === SplitMnemonicSteps.GenerateShares && (
           <GenerateShares
-            onSubmit={({ shares, threshold }) => {
+            onSubmit={(shares) => {
               setShares(shares);
-              setThreshold(threshold);
               setActiveStep(SplitMnemonicSteps.ConfirmShares);
             }}
             mnemonic={mnemonic as string}
@@ -61,9 +58,7 @@ export function SplitMnemonic() {
         {activeStep === SplitMnemonicSteps.ConfirmShares && (
           <ConfirmShares
             onSubmit={reset}
-            mnemonic={mnemonic as string}
-            shares={shares as string[]}
-            threshold={threshold as number}
+            shares={shares as Record<string, string>}
           />
         )}
       </Grid>

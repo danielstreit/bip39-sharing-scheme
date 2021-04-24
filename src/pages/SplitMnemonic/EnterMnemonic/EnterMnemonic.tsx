@@ -14,14 +14,21 @@ export interface EnterMnemonicProps {
 
 interface FormData {
   mode: EnterMnemonicMode;
+  strength?: number;
   words: string | string[];
 }
 
 export function EnterMnemonic({ onSubmit }: EnterMnemonicProps) {
-  const formMethods = useForm();
+  const formMethods = useForm<FormData>({
+    defaultValues: {
+      mode: EnterMnemonicMode.Word,
+      strength: 256,
+      words: [],
+    },
+  });
   const { handleSubmit, setError, watch } = formMethods;
 
-  const mode = watch("mode", EnterMnemonicMode.Word);
+  const mode = watch("mode");
 
   const os = useCallback(
     (formData: FormData) => {
