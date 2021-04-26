@@ -16,7 +16,8 @@ export function SplitMnemonic() {
   const [activeStep, setActiveStep] = useState(
     SplitMnemonicSteps.EnterMnemonic
   );
-  const reset = useCallback(() => {
+  const onDone = useCallback(() => {
+    console.log("Done!");
     setActiveStep(SplitMnemonicSteps.EnterMnemonic);
     setMnemonic(undefined);
     setShares(undefined);
@@ -57,7 +58,7 @@ export function SplitMnemonic() {
         )}
         {activeStep === SplitMnemonicSteps.ConfirmShares && (
           <ConfirmShares
-            onSubmit={reset}
+            onDone={onDone}
             shares={shares as Record<string, string>}
           />
         )}

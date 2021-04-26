@@ -1,11 +1,17 @@
 import { Autocomplete, createFilterOptions } from "@material-ui/lab";
-import { Controller, useFormContext } from "react-hook-form";
+import {
+  Controller,
+  get,
+  useFormContext,
+  UseControllerOptions,
+} from "react-hook-form";
 import { TextField } from "@material-ui/core";
 import { wordlists } from "bip39";
 import { useRef } from "react";
 
 export interface Bip39WordInputProps {
   autoFocus?: boolean;
+  // TODO: Can we remove error here, consume from context instead?
   error?: boolean;
   label?: string;
   name: string;
@@ -17,17 +23,22 @@ const filterOptions = createFilterOptions({
 
 export function Bip39WordInput({
   autoFocus,
-  error,
+  error: removeMe,
   label,
   name,
-}: Bip39WordInputProps) {
+  rules,
+  ...passThrough
+}: Bip39WordInputProps & UseControllerOptions) {
   const inputRef = useRef();
-  const { control } = useFormContext();
+  const { control, errors } = useFormContext();
+
+  const error = get(errors, name);
 
   return (
     <Controller
+      {...passThrough}
       control={control}
-      defaultValue={null}
+      defaultValue=""
       name={name}
       onFocus={() => {
         if (inputRef.current) {
@@ -50,6 +61,7 @@ export function Bip39WordInput({
               autoFocus={autoFocus}
               inputRef={inputRef}
               error={!!error}
+              helperText={error?.message}
               label={label}
               variant="outlined"
             />
@@ -58,6 +70,7 @@ export function Bip39WordInput({
       )}
       rules={{
         required: true,
+        ...rules,
       }}
     />
   );

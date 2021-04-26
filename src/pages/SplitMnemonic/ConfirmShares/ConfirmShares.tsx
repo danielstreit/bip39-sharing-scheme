@@ -1,10 +1,16 @@
-import { useForm, useFieldArray, FormProvider } from "react-hook-form";
-import { Button, Grid } from "@material-ui/core";
-import { ShareInput } from "./ShareInput";
-import { SelectMnemonicStrength } from "../../../components/SelectMnemonicStrength";
+import { useState } from "react";
+import { Bip39WordInput } from "../../../components/Bip39WordInput";
+import { useForm, FormProvider } from "react-hook-form";
+import {
+  Button,
+  Grid,
+  LinearProgress,
+  TextField,
+  Typography,
+} from "@material-ui/core";
 
 export interface ConfirmSharesProps {
-  onSubmit: () => void;
+  onDone: () => void;
   shares: Record<string, string>;
 }
 
@@ -13,55 +19,92 @@ interface Share {
   mnemonic: string[];
 }
 
-interface FormInputs {
-  shares: Share[];
-  strength: number;
-}
+export function ConfirmShares({ onDone, shares }: ConfirmSharesProps) {
+  const shareIds = Object.keys(shares);
+  const numShares = shareIds.length;
+  const numWordsPerShare = shares[shareIds[0]].split(" ").length;
 
-export function ConfirmShares({ onSubmit, shares }: ConfirmSharesProps) {
-  const formMethods = useForm<FormInputs>({
+  const [confirmedShares, setConfirmedShares] = useState<string[]>([]);
+
+  const currentShare = confirmedShares.length + 1;
+
+  const formMethods = useForm<Share>({
     defaultValues: {
-      shares: [{ id: "", mnemonic: [] }],
-      strength: 256,
+      id: "",
+      mnemonic: Array(numWordsPerShare).fill(""),
     },
   });
-  const { control, handleSubmit } = formMethods;
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "shares",
-    keyName: "key",
-  });
+
+  const { errors, getValues, handleSubmit, register, reset } = formMethods;
+
+  const onSubmit = (values: Share) => {
+    if (currentShare < numShares) {
+      setConfirmedShares((prev) => prev.concat(values.id));
+      reset();
+    } else {
+      onDone();
+    }
+  };
+
+  console.log("currentShare", currentShare);
+  console.log("confirmedShares", confirmedShares);
+
+  console.log("shares", shares);
 
   return (
     <FormProvider {...formMethods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
-          <Grid container item xs={12}>
-            <SelectMnemonicStrength />
+          <Grid item xs={12}>
+            <LinearProgress
+              variant="determinate"
+              value={(100 * currentShare) / numShares}
+            />
           </Grid>
-          {fields.map((field, index) => {
-            console.log("field", field);
-            return (
-              <ShareInput
-                key={field.key}
-                field={field}
-                remove={() => {
-                  remove(index);
-                }}
+          <Grid item xs={12}>
+            <Typography>
+              Confirm Share {currentShare} of {numShares}
+            </Typography>
+          </Grid>
+
+          <Grid container item xs={12} spacing={3}>
+            <Grid item xs={12}>
+              <TextField
+                error={!!errors.id}
+                helperText={errors.id?.message}
+                inputRef={register({
+                  required: "Required",
+                  validate: {
+                    notValidatedYet: (v) =>
+                      !confirmedShares.includes(v) || "Share already confirmed",
+                    isShareId: (v) =>
+                      shareIds.includes(v) || "Not in share set",
+                  },
+                })}
+                label="Share ID"
+                name="id"
+                variant="outlined"
               />
-            );
-          })}
-          <Grid container item xs={12} spacing={3} justify="flex-end">
-            <Grid item>
-              <Button
-                onClick={() => {
-                  append({}, true);
-                }}
-                variant="contained"
-              >
-                Add share
-              </Button>
             </Grid>
+
+            {Array(numWordsPerShare)
+              .fill("")
+              .map((_value: string, index: number) => (
+                <Grid key={index} item lg={3} md={4} sm={6} xs={12}>
+                  <Bip39WordInput
+                    name={`mnemonic[${index}]`}
+                    label={`Word ${index + 1}`}
+                    error={!!errors?.mnemonic?.[index]}
+                    rules={{
+                      validate: (v) => {
+                        const id = getValues("id");
+                        const expectedWord = shares[id].split(" ")[index];
+                        return v === expectedWord || "Unexpected word";
+                      },
+                    }}
+                  />
+                </Grid>
+              ))}
           </Grid>
           <Grid container item xs={12} spacing={3} justify="flex-end">
             <Grid item>
